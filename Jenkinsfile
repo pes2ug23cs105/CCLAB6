@@ -24,7 +24,7 @@ pipeline {
             steps {
                 sh '''
                 docker rm -f nginx-lb || true
-                # Use $(pwd) to ensure it picks the current workspace path
+                # Ensure the path starts with $(pwd) and leads exactly to the file
                 docker run -d --name nginx-lb -p 80:80 --network app-network \
                 -v $(pwd)/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro nginx
                 sleep 2
