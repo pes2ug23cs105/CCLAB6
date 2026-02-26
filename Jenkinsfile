@@ -24,10 +24,13 @@ pipeline {
             steps {
                 sh '''
                 docker rm -f nginx-lb || true
-                # Ensure the path starts with $(pwd) and leads exactly to the file
-                docker run -d --name nginx-lb -p 80:80 --network app-network \
-                -v $(pwd)/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro nginx
+                # Start NGINX without the volume first
+                docker run -d --name nginx-lb -p 80:80 --network app-network nginx
                 sleep 2
+                # Manually copy the config file into the container
+                docker cp nginx/default.conf nginx-lb:/etc/nginx/conf.d/default.conf
+                # Reload NGINX to apply the config
+                docker exec nginx-lb nginx -s reload
                 '''
             }
         }
